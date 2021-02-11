@@ -3,6 +3,7 @@ package com.crowdstreet.assignment.endpoint;
 import com.crowdstreet.assignment.client.ExampleClient;
 import com.crowdstreet.assignment.data.DocumentRequestRepository;
 import com.crowdstreet.assignment.data.model.DocumentRequestRequestBody;
+import com.crowdstreet.assignment.service.DocumentRequestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -37,9 +38,9 @@ public class DocumentRequestEndpointDbIntegrationTests {
     @Test
     public void doesNotPersistDocumentRequestWhenCallbackRequestFails() {
         ExampleClient exampleClient = new ExampleClient(mockRestTemplate);
-        DocumentRequestEndpoint endpoint = new
-                DocumentRequestEndpoint(documentRequestRepository,
-                exampleClient);
+        DocumentRequestService documentRequestService =
+                new DocumentRequestService(documentRequestRepository, exampleClient);
+        DocumentRequestEndpoint endpoint = new DocumentRequestEndpoint(documentRequestService);
 
         when(mockRestTemplate.postForEntity(anyString(), any(), any()))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));

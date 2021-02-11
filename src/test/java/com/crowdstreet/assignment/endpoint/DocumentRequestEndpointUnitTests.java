@@ -5,6 +5,7 @@ import com.crowdstreet.assignment.data.DocumentRequestRepository;
 import com.crowdstreet.assignment.data.model.CallbackRequest;
 import com.crowdstreet.assignment.data.model.DocumentRequest;
 import com.crowdstreet.assignment.data.model.DocumentRequestRequestBody;
+import com.crowdstreet.assignment.service.DocumentRequestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -34,8 +35,10 @@ public class DocumentRequestEndpointUnitTests {
     @Test
     public void createsDocumentRequestFromRequestBody() {
         ExampleClient exampleClient = new ExampleClient(mockRestTemplate);
+        DocumentRequestService documentRequestService =
+                new DocumentRequestService(mockDocumentRequestRepository, exampleClient);
         DocumentRequestEndpoint endpoint = new
-                DocumentRequestEndpoint(mockDocumentRequestRepository, exampleClient);
+                DocumentRequestEndpoint(documentRequestService);
 
         String testBodyValue = "test";
         DocumentRequestRequestBody documentRequestRequestBody =
@@ -54,8 +57,10 @@ public class DocumentRequestEndpointUnitTests {
     @Test
     public void performsCallbackRequestOnDocumentRequestCreation() {
         ExampleClient exampleClient = new ExampleClient(mockRestTemplate);
+        DocumentRequestService documentRequestService =
+                new DocumentRequestService(mockDocumentRequestRepository, exampleClient);
         DocumentRequestEndpoint endpoint = new
-                DocumentRequestEndpoint(mockDocumentRequestRepository, exampleClient);
+                DocumentRequestEndpoint(documentRequestService);
 
         DocumentRequestRequestBody documentRequestRequestBody =
                 new DocumentRequestRequestBody("test");
