@@ -1,13 +1,12 @@
 package com.crowdstreet.assignment.endpoint;
 
+import com.crowdstreet.assignment.data.model.DocumentProcessingStatusBody;
 import com.crowdstreet.assignment.data.model.DocumentRequestRequestBody;
+import com.crowdstreet.assignment.data.model.ProcessingStatus;
 import com.crowdstreet.assignment.service.DocumentRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
@@ -29,10 +28,18 @@ public class DocumentRequestEndpoint {
     public ResponseEntity<Object> createDocumentRequestProcessingStatus(
             @PathVariable Long id,
             @RequestBody String startedStatus) {
-        if (!Objects.equals(startedStatus, "STARTED")) {
+        if (!Objects.equals(startedStatus, ProcessingStatus.STARTED.toString())) {
             return ResponseEntity.badRequest().build();
         }
-        documentRequestService.updateStatus(id, "STARTED");
+        documentRequestService.updateStatus(id, ProcessingStatus.STARTED);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/callback/{id}")
+    public ResponseEntity<Object> updateDocumentRequestProcessingStatus(
+            @PathVariable Long id,
+            @RequestBody DocumentProcessingStatusBody processingStatus) {
+        documentRequestService.updateStatus(id, processingStatus.status);
         return ResponseEntity.noContent().build();
     }
 }

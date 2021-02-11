@@ -1,7 +1,9 @@
 package com.crowdstreet.assignment.endpoint;
 
 import com.crowdstreet.assignment.client.ExampleClient;
+import com.crowdstreet.assignment.data.model.DocumentProcessingStatusBody;
 import com.crowdstreet.assignment.data.model.DocumentRequestRequestBody;
+import com.crowdstreet.assignment.data.model.ProcessingStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -74,4 +77,23 @@ public class DocumentRequestEndpointHttpTests {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    public void onCallbackStatusUpdate_rejectsInvalidBodyAsBadRequest() throws Exception {
+        mvc.perform(put("/callback/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("invalid"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void onCallbackStatusUpdate_acceptsValidBody() throws Exception {
+        mvc.perform(put("/callback/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                        new DocumentProcessingStatusBody(
+                                ProcessingStatus.COMPLETED,
+                                "this is detail"
+                        ))))
+                .andExpect(status().isNoContent());
+    }
 }

@@ -1,6 +1,7 @@
 package com.crowdstreet.assignment.data;
 
 import com.crowdstreet.assignment.data.model.DocumentRequest;
+import com.crowdstreet.assignment.data.model.ProcessingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,5 +18,5 @@ public interface DocumentRequestRepository
     @Query(" UPDATE DocumentRequest " +
             "SET status = ?2 " +
             "WHERE id = ?1")
-    void updateStatus(long documentRequestId, String status);
+    void updateStatus(long documentRequestId, ProcessingStatus status);
 }

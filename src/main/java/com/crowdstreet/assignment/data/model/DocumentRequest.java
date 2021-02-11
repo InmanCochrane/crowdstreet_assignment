@@ -8,7 +8,7 @@ import javax.persistence.Id;
 public class DocumentRequest {
     public String body;
 
-    public String status;
+    public ProcessingStatus status;
 
     @Id
     @GeneratedValue
@@ -18,5 +18,6 @@ public class DocumentRequest {
         this.body = requestBody.body;
     }
 
-    public DocumentRequest() {}
+    public DocumentRequest() {
+    }
 }
