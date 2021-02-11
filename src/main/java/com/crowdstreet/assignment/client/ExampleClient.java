@@ -15,11 +15,16 @@ public class ExampleClient {
         this.restTemplate = restTemplate;
     }
 
+    /**
+     * 🚨 WARNING 🚨
+     * The implementation of this method is commented out so the service can run.
+     * Un-comment the implementation when running automated tests.
+     */
     public void performCallbackRequest(CallbackRequest callbackRequest) {
-        restTemplate.postForEntity(
-                String.format("%s/request", API_BASE),
-                callbackRequest,
-                Object.class
-        );
+//        restTemplate.postForEntity(
+//                String.format("%s/request", API_BASE),
+//                callbackRequest,
+//                Object.class
+//        );
     }
 }
