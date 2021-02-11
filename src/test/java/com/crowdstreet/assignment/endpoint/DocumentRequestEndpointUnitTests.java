@@ -13,9 +13,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -81,22 +83,35 @@ public class DocumentRequestEndpointUnitTests {
         memoryBoundedEndpoint.createDocumentRequestProcessingStatus(
                 documentRequestId, ProcessingStatus.STARTED.toString());
         verify(mockDocumentRequestRepository)
-                .updateStatus(documentRequestId, ProcessingStatus.STARTED);
+                .updateStatus(documentRequestId, ProcessingStatus.STARTED, null);
     }
 
     @Test
     public void updatesDocumentRequestProcessingStatusOnCallbackPut() {
         Arrays.stream(ProcessingStatus.values()).forEach(status -> {
             long documentRequestId = ThreadLocalRandom.current().nextLong();
+            String detail = "test " + documentRequestId;
             DocumentProcessingStatusBody processingStatus =
-                    new DocumentProcessingStatusBody(
-                            status,
-                            "test " + documentRequestId
-                    );
+                    new DocumentProcessingStatusBody(status, detail);
             memoryBoundedEndpoint.updateDocumentRequestProcessingStatus(
                     documentRequestId, processingStatus);
             verify(mockDocumentRequestRepository)
-                    .updateStatus(documentRequestId, processingStatus.status);
+                    .updateStatus(documentRequestId, processingStatus.status, detail);
         });
     }
+
+    @Test
+    public void retrievesDocumentRequest() {
+        DocumentRequest documentRequest = new DocumentRequest();
+        documentRequest.id = ThreadLocalRandom.current().nextLong();
+        documentRequest.body = "test body";
+        documentRequest.status = ProcessingStatus.COMPLETED;
+        documentRequest.detail = "test detail";
+
+        when(mockDocumentRequestRepository.findById(documentRequest.id))
+                .thenReturn(Optional.of(documentRequest));
+        assertSame(documentRequest,
+                memoryBoundedEndpoint.getDocumentRequest(documentRequest.id).getBody());
+    }
+
 }

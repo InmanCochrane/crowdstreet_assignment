@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class DocumentRequestService {
     private final DocumentRequestRepository documentRequestRepository;
@@ -29,7 +31,15 @@ public class DocumentRequestService {
         exampleClient.performCallbackRequest(CallbackRequest.from(documentRequest));
     }
 
+    public void updateStatus(Long id, ProcessingStatus status, String detail) {
+        documentRequestRepository.updateStatus(id, status, detail);
+    }
+
     public void updateStatus(Long id, ProcessingStatus status) {
-        documentRequestRepository.updateStatus(id, status);
+        documentRequestRepository.updateStatus(id, status, null);
+    }
+
+    public Optional<DocumentRequest> get(Long id) {
+        return documentRequestRepository.findById(id);
     }
 }

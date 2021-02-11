@@ -18,23 +18,27 @@ class DocumentRequestRepositoryTest {
 
     @Test
     public void createsDocumentRequest() {
-        DocumentRequest documentRequest =
-                new DocumentRequest(new DocumentRequestRequestBody("test"));
-        DocumentRequest savedDocumentRequest = documentRequestRepository
-                .save(documentRequest);
-        assertEquals(documentRequest, documentRequestRepository
-                .findById(savedDocumentRequest.id).orElseThrow());
+        DocumentRequest documentRequest = new DocumentRequest(
+                new DocumentRequestRequestBody("test"));
+        DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
+        assertEquals(documentRequest,
+                documentRequestRepository.findById(savedDocumentRequest.id).orElseThrow());
     }
 
     @Test
     public void updatesDocumentRequestStatus() {
-        DocumentRequest documentRequest =
-                new DocumentRequest(new DocumentRequestRequestBody("test"));
-        DocumentRequest savedDocumentRequest = documentRequestRepository
-                .save(documentRequest);
+        DocumentRequest documentRequest = new DocumentRequest(
+                new DocumentRequestRequestBody("test"));
+        DocumentRequest savedDocumentRequest = documentRequestRepository.save(documentRequest);
+
         ProcessingStatus status = ProcessingStatus.PROCESSED;
-        documentRequestRepository.updateStatus(savedDocumentRequest.id, status);
-        assertEquals(status, documentRequestRepository
-                .findById(savedDocumentRequest.id).orElseThrow().status);
+        String detail = "test detail";
+        documentRequestRepository.updateStatus(savedDocumentRequest.id, status, detail);
+
+        documentRequest.status = status;
+        documentRequest.detail = detail;
+
+        assertEquals(documentRequest,
+                documentRequestRepository.findById(savedDocumentRequest.id).orElseThrow());
     }
 }

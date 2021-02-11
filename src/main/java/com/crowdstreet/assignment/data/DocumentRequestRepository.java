@@ -16,7 +16,8 @@ public interface DocumentRequestRepository
     @Modifying(clearAutomatically = true)
     @Transactional
     @Query(" UPDATE DocumentRequest " +
-            "SET status = ?2 " +
-            "WHERE id = ?1")
-    void updateStatus(long documentRequestId, ProcessingStatus status);
+            "SET    status = ?2,    " +
+            "       detail = ?3     " +
+            "WHERE  id = ?1         ")
+    void updateStatus(long documentRequestId, ProcessingStatus status, String detail);
 }

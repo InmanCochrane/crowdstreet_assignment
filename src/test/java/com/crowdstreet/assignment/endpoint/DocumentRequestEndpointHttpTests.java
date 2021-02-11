@@ -1,7 +1,9 @@
 package com.crowdstreet.assignment.endpoint;
 
 import com.crowdstreet.assignment.client.ExampleClient;
+import com.crowdstreet.assignment.data.DocumentRequestRepository;
 import com.crowdstreet.assignment.data.model.DocumentProcessingStatusBody;
+import com.crowdstreet.assignment.data.model.DocumentRequest;
 import com.crowdstreet.assignment.data.model.DocumentRequestRequestBody;
 import com.crowdstreet.assignment.data.model.ProcessingStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,8 +21,8 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -34,6 +36,9 @@ public class DocumentRequestEndpointHttpTests {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private DocumentRequestRepository documentRequestRepository;
 
     private MockRestServiceServer mockServer;
 
@@ -96,4 +101,20 @@ public class DocumentRequestEndpointHttpTests {
                         ))))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    public void retrievesDocumentRequest() throws Exception {
+        DocumentRequest documentRequest = documentRequestRepository
+                .save(new DocumentRequest());
+        mvc.perform(get("/status/{id}", documentRequest.id))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void respondsNotFoundWhenDocumentRequestIsAbsent() throws Exception {
+        mvc.perform(get("/status/{id}", documentRequestRepository.count() + 1))
+                .andExpect(status().isNotFound());
+    }
+
 }

@@ -8,7 +8,7 @@ public class DocumentProcessingStatusBody {
     public ProcessingStatus status;
 
     @JsonProperty
-    String detail;
+    public String detail;
 
     @JsonCreator
     public DocumentProcessingStatusBody(@JsonProperty ProcessingStatus status,

@@ -10,6 +10,8 @@ public class DocumentRequest {
 
     public ProcessingStatus status;
 
+    public String detail;
+
     @Id
     @GeneratedValue
     public Long id;

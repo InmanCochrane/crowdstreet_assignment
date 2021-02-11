@@ -16,7 +16,10 @@ public class ExampleClient {
     }
 
     public void performCallbackRequest(CallbackRequest callbackRequest) {
-        restTemplate.postForEntity(String.format("%s/request", API_BASE),
-                callbackRequest, Object.class);
+        restTemplate.postForEntity(
+                String.format("%s/request", API_BASE),
+                callbackRequest,
+                Object.class
+        );
     }
 }
