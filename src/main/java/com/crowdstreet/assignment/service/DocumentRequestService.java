@@ -26,4 +26,8 @@ public class DocumentRequestService {
                 .save(new DocumentRequest(requestBody));
         exampleClient.performCallbackRequest(CallbackRequest.from(documentRequest));
     }
+
+    public void updateStatus(Long id, String status) {
+        documentRequestRepository.updateStatus(id, status);
+    }
 }

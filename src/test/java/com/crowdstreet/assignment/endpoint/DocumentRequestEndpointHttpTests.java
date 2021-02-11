@@ -40,7 +40,7 @@ public class DocumentRequestEndpointHttpTests {
     }
 
     @Test
-    public void rejectsInvalidBodyAsBadRequest() throws Exception {
+    public void onRequestCreation_rejectsInvalidBodyAsBadRequest() throws Exception {
         mvc.perform(post("/request")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("invalid"))
@@ -48,7 +48,7 @@ public class DocumentRequestEndpointHttpTests {
     }
 
     @Test
-    public void acceptsValidBody() throws Exception {
+    public void onRequestCreation_acceptsValidBody() throws Exception {
         mockServer.expect(ExpectedCount.once(),
                 requestTo(String.format("%s/request", ExampleClient.API_BASE)))
                 .andRespond(withStatus(HttpStatus.OK));
@@ -56,6 +56,22 @@ public class DocumentRequestEndpointHttpTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(new DocumentRequestRequestBody("test"))))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void onCallbackStatusCreation_rejectsInvalidBodyAsBadRequest() throws Exception {
+        mvc.perform(post("/callback/{id}", 1)
+                .contentType(MediaType.TEXT_PLAIN)
+                .content("invalid"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void onCallbackStatusCreation_acceptsValidBody() throws Exception {
+        mvc.perform(post("/callback/{id}", 1)
+                .contentType(MediaType.TEXT_PLAIN)
+                .content("STARTED"))
+                .andExpect(status().isNoContent());
     }
 
 }

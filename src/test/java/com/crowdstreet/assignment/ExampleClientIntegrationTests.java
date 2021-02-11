@@ -21,7 +21,10 @@ public class ExampleClientIntegrationTests {
         try {
             exampleClient.performCallbackRequest(callbackRequest);
         } catch (HttpClientErrorException clientErrorException) {
-            // No-op
+            // No-op for real call to example.com
+        } catch (Exception e) {
+            // For anything else (e.g. no internet connection)
+            e.printStackTrace();
         }
     }
 }

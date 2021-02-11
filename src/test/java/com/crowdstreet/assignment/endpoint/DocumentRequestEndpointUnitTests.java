@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -27,19 +29,21 @@ public class DocumentRequestEndpointUnitTests {
     @Mock
     RestTemplate mockRestTemplate;
 
+    DocumentRequestEndpoint memoryBoundedEndpoint;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        memoryBoundedEndpoint = new DocumentRequestEndpoint(
+                new DocumentRequestService(
+                        mockDocumentRequestRepository,
+                        new ExampleClient(mockRestTemplate)
+                ));
     }
 
     @Test
     public void createsDocumentRequestFromRequestBody() {
-        ExampleClient exampleClient = new ExampleClient(mockRestTemplate);
-        DocumentRequestService documentRequestService =
-                new DocumentRequestService(mockDocumentRequestRepository, exampleClient);
-        DocumentRequestEndpoint endpoint = new
-                DocumentRequestEndpoint(documentRequestService);
-
         String testBodyValue = "test";
         DocumentRequestRequestBody documentRequestRequestBody =
                 new DocumentRequestRequestBody(testBodyValue);
@@ -48,20 +52,15 @@ public class DocumentRequestEndpointUnitTests {
                 .save(any(DocumentRequest.class)))
                 .thenReturn(documentRequest);
 
-        ArgumentCaptor<DocumentRequest> argument = ArgumentCaptor.forClass(DocumentRequest.class);
-        endpoint.createDocumentRequest(documentRequestRequestBody);
-        verify(mockDocumentRequestRepository).save(argument.capture());
-        assertEquals(testBodyValue, argument.getValue().body);
+        ArgumentCaptor<DocumentRequest> documentRequestArgument =
+                ArgumentCaptor.forClass(DocumentRequest.class);
+        memoryBoundedEndpoint.createDocumentRequest(documentRequestRequestBody);
+        verify(mockDocumentRequestRepository).save(documentRequestArgument.capture());
+        assertEquals(testBodyValue, documentRequestArgument.getValue().body);
     }
 
     @Test
     public void performsCallbackRequestOnDocumentRequestCreation() {
-        ExampleClient exampleClient = new ExampleClient(mockRestTemplate);
-        DocumentRequestService documentRequestService =
-                new DocumentRequestService(mockDocumentRequestRepository, exampleClient);
-        DocumentRequestEndpoint endpoint = new
-                DocumentRequestEndpoint(documentRequestService);
-
         DocumentRequestRequestBody documentRequestRequestBody =
                 new DocumentRequestRequestBody("test");
         DocumentRequest documentRequest = new DocumentRequest(documentRequestRequestBody);
@@ -69,7 +68,7 @@ public class DocumentRequestEndpointUnitTests {
                 .save(any(DocumentRequest.class)))
                 .thenReturn(documentRequest);
 
-        endpoint.createDocumentRequest(documentRequestRequestBody);
+        memoryBoundedEndpoint.createDocumentRequest(documentRequestRequestBody);
         verify(mockRestTemplate).postForEntity(
                 ArgumentMatchers.eq("https://www.example.com/request"),
                 ArgumentMatchers.eq(CallbackRequest.from(documentRequest)),
@@ -77,4 +76,11 @@ public class DocumentRequestEndpointUnitTests {
         );
     }
 
+    @Test
+    public void updatesDocumentRequestProcessingStatusOnCallbackPost() {
+        long documentRequestId = ThreadLocalRandom.current().nextLong();
+        memoryBoundedEndpoint.createDocumentRequestProcessingStatus(
+                documentRequestId, "STARTED");
+        verify(mockDocumentRequestRepository).updateStatus(documentRequestId, "STARTED");
+    }
 }

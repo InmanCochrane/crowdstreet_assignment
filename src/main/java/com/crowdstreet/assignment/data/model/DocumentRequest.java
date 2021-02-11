@@ -8,11 +8,15 @@ import javax.persistence.Id;
 public class DocumentRequest {
     public String body;
 
+    public String status;
+
     @Id
     @GeneratedValue
-    Long id;
+    public Long id;
 
     public DocumentRequest(DocumentRequestRequestBody requestBody) {
         this.body = requestBody.body;
     }
+
+    public DocumentRequest() {}
 }
